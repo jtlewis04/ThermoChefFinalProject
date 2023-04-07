@@ -13,11 +13,13 @@ void loop() {
   voltage = analogRead(A0) * 0.004882813;   //convert the analog reading, which varies from 0 to 1023, back to a voltage value from 0-5 volts
   degreesC = (voltage - 0.5) * 100.0;       //convert the voltage to a temperature in degrees Celsius
   degreesF = degreesC * (9.0 / 5.0) + 32.0;
-  // time = byte(millis()/1000.0);
+  time = byte(millis()/1000.0);
   // if(Serial.available()){
   // Serial.write(time);
   Serial.write((byte)degreesC);
+  delay(20);
   Serial.flush();
+  Serial.write(time);
   // }Q
 
   delay(1000);                              //delay for 1 second between each reading (this makes the display less noisy)
