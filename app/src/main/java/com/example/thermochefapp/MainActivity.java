@@ -1,6 +1,7 @@
 package com.example.thermochefapp;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
@@ -92,10 +93,6 @@ public class MainActivity extends AppCompatActivity {
         buttonToggle.setEnabled(false);
 
 
-
-
-
-
         binding.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -106,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
 
         // If a bluetooth device has been selected from SelectDeviceActivity
         deviceName = getIntent().getStringExtra("deviceName");
-        if (deviceName != null){
+        if (deviceName != null) {
             // Get the device address to make BT Connection
             deviceAddress = getIntent().getStringExtra("deviceAddress");
             // Show progress and connection status
@@ -120,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
             selected device (see the thread code below)
              */
             BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-            createConnectThread = new CreateConnectThread(bluetoothAdapter,deviceAddress);
+            createConnectThread = new CreateConnectThread(bluetoothAdapter, deviceAddress);
             createConnectThread.start();
         }
 
@@ -129,10 +126,10 @@ public class MainActivity extends AppCompatActivity {
          */
         handler = new Handler(Looper.getMainLooper()) {
             @Override
-            public void handleMessage(Message msg){
-                switch (msg.what){
+            public void handleMessage(Message msg) {
+                switch (msg.what) {
                     case CONNECTING_STATUS:
-                        switch(msg.arg1){
+                        switch (msg.arg1) {
                             case 1:
                                 toolbar.setSubtitle("Connected to " + deviceName);
                                 progressBar.setVisibility(View.GONE);
@@ -149,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
 
                     case MESSAGE_READ:
                         String arduinoMsg = msg.obj.toString(); // Read message from Arduino
-                        switch (arduinoMsg.toLowerCase()){
+                        switch (arduinoMsg.toLowerCase()) {
                             case "led is turned on":
 
                                 textViewInfo.setText("Arduino Message : " + arduinoMsg);
@@ -216,9 +213,12 @@ public class MainActivity extends AppCompatActivity {
             BluetoothDevice bluetoothDevice = bluetoothAdapter.getRemoteDevice(address);
             BluetoothSocket tmp = null;
 
-            checkPermission(Manifest.permission.BLUETOOTH,BLUETOOTH_CODE);
+            checkPerms(MainActivity.this);
 
 
+            if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
             UUID uuid = bluetoothDevice.getUuids()[0].getUuid();
 
             try {
@@ -238,9 +238,12 @@ public class MainActivity extends AppCompatActivity {
 
         public void run() {
             // Cancel discovery because it otherwise slows down the connection.
-            checkPermission(Manifest.permission.BLUETOOTH_ADMIN,BLUETOOTH_ADMIN_CODE);
+            checkPerms(MainActivity.this);
 
             BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
             bluetoothAdapter.cancelDiscovery();
             try {
                 // Connect to the remote device through the socket. This call blocks
@@ -356,49 +359,26 @@ public class MainActivity extends AppCompatActivity {
         startActivity(a);
     }
 
-    // Function to check and request permission
-    public void checkPermission(String permission, int requestCode)
-    {
-        // Checking if permission is not granted
-        if (ContextCompat.checkSelfPermission(MainActivity.this, permission) == PackageManager.PERMISSION_DENIED)
-        {
-            ActivityCompat.requestPermissions(MainActivity.this, new String[]{permission}, requestCode);
+
+    public static boolean checkPerms(Activity activity) {
+        int check1 = ContextCompat.checkSelfPermission(activity, Manifest.permission.BLUETOOTH_CONNECT);
+        int check2 = ContextCompat.checkSelfPermission(activity, Manifest.permission.BLUETOOTH_ADMIN);
+        int check3 = ContextCompat.checkSelfPermission(activity, Manifest.permission.BLUETOOTH);
+        int check4 = ContextCompat.checkSelfPermission(activity, Manifest.permission.BLUETOOTH_SCAN);
+        int check5 = ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION);
+        int check6 = ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION);
+        int baseCheck = PackageManager.PERMISSION_DENIED;
+        if (check1 == baseCheck || check2 == baseCheck || check3 == baseCheck || check4 == baseCheck || check5 == baseCheck || check6 == baseCheck) {
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.BLUETOOTH_SCAN}, 1);
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.BLUETOOTH_ADMIN}, 2);
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.BLUETOOTH}, 3);
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, 4);
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 5);
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 6);
+            return true;
         }
-        else {
-            Toast.makeText(MainActivity.this, "Permission already granted", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    // This function is called when user accept or decline the permission.
-    // Request Code is used to check which permission called this function.
-    // This request code is provided when user is prompt for permission.
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String[] permissions,
-                                           @NonNull int[] grantResults)
-    {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (requestCode == BLUETOOTH_CODE) {
-
-            // Checking whether user granted the permission or not.
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                // Showing the toast message
-                Toast.makeText(MainActivity.this, "Bluetooth Permission Granted", Toast.LENGTH_SHORT).show();
-            }
-            else {
-                Toast.makeText(MainActivity.this, "Bluetooth Permission Denied", Toast.LENGTH_SHORT).show();
-            }
-        }
-        else if (requestCode == BLUETOOTH_ADMIN_CODE) {
-            if (grantResults.length > 0
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(MainActivity.this, "Bluetooth-Admin Permission Granted", Toast.LENGTH_SHORT).show();
-            }
-            else {
-                Toast.makeText(MainActivity.this, "Bluetooth-Admin Permission Denied", Toast.LENGTH_SHORT).show();
-            }
+        else{
+            return true;
         }
     }
 }
