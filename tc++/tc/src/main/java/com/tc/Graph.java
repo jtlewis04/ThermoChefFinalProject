@@ -8,17 +8,17 @@ import java.awt.Color;
 import java.awt.Graphics;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-
+// Dependent on ArduinoConnect.java
 
 public class Graph 
 {
         private final int X_AXIS = 300;
         private final int Y_AXIS = 50;
-        private ArrayList<Byte> x;
-        private ArrayList<Byte> y;
+        private ArrayList<Integer> x;
+        private ArrayList<Integer> y;
         String name;
         PolynomialFunction tempFun;
-    public Graph(ArrayList<Byte> x, ArrayList<Byte> y, String name)
+    public Graph(ArrayList<Integer> x, ArrayList<Integer> y, String name)
     {
         PolynomialCurveFitter polyboy= PolynomialCurveFitter.create(2);
         WeightedObservedPoints data = new WeightedObservedPoints();
@@ -27,7 +27,7 @@ public class Graph
         this.name = name;
         for(int i = 0; i<x.size(); i++)
         {
-            data.add(x.get(i),y.get(i));
+            data.add(x.get(i),Integer.valueOf(y.get(i)));
             // System.out.println(x.get(i) + " " + y.get(i));
         }
         // Polynomial fit function created
@@ -55,7 +55,7 @@ public class Graph
             System.out.println("Time: " + x + " " + "Predicted Temp: " + (int)tempFun.value(x));
         }
             }
-        };
+        }; 
         panel.setSize(500, 500);
         panel.setVisible(true);
         frame.add(panel);
