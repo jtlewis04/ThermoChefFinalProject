@@ -10,4 +10,5 @@
     <color name="light_grey">#FF2B2531</color>
     <color name="black_purple">#FF332B33</color>
     <color name="pastel_purple">#A38BA3</color>
+    <color name="bkg">#171717</color>
 </resources>
