@@ -11,11 +11,15 @@ float degreesC = 0;  //the temperature in Celsius, calculated from the voltage
 long longtime;
 int time = 0;
 int bufferTime = 0;
+int button = 6;
+int stopButton = 7;
 
 LiquidCrystal lcd(13, 12, 11, 10, 9, 8);   // tell the RedBoard what pins are connected to the display
 Adafruit_MAX31855 thermocouple(MAXCLK, MAXCS, MAXDO);
 
 void setup() {
+  pinMode(button, INPUT_PULLUP);
+   pinMode(stopButton, INPUT_PULLUP);
   Serial.begin(9600);
   lcd.begin(16,2);
   lcd.clear();
@@ -26,6 +30,18 @@ void setup() {
 void loop() {
   degreesC = thermocouple.readCelsius();
   time = (millis() / 1000.0);
+
+  if(digitalRead(stopButton)==LOW){
+    Serial.write(byte(degreesC));
+    delay(1);
+    Serial.write(byte(10000/256));
+  delay(1);
+  // Last 8 bits
+  Serial.write(byte(10000));
+  Serial.flush();
+  }
+  if(digitalRead(button)==LOW){
+  degreesC = thermocouple.readCelsius();
 lcd.setCursor(0,0);
   lcd.print("Temp: ");
   lcd.print(degreesC);
@@ -53,6 +69,10 @@ lcd.setCursor(0,0);
   Serial.write(byte(time));
   Serial.flush();
   }
-
+}
+else
+{
+  return 0;
+}
   delay(1000);  //delay for 1 second between each reading (this makes the display less noisy)
 }

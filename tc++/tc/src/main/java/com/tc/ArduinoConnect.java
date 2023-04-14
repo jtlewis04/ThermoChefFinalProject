@@ -11,6 +11,7 @@ public class ArduinoConnect {
     private static InputStream data;
     public static ArrayList<Integer> x;
     public static ArrayList<Integer> y;
+    public static boolean read = true;
 
     public static void readArduino() throws IOException, InterruptedException {
         x = new ArrayList<>();
@@ -28,7 +29,8 @@ public class ArduinoConnect {
         comport.setComPortParameters(9600, 8, 1, 0);
         if (comport.openPort()) {
             System.out.println("Port open");
-            for (int i = 0; i < 500; i++) {
+            out:
+            while(read) {
                 data = comport.getInputStream();
                 if (data.available() > 0) {
 
@@ -37,20 +39,25 @@ public class ArduinoConnect {
                     byte[] serialBuffer = new byte[data.available()];
                     // Assigns bytes from Serial conenction to byte array
                     data.readNBytes(serialBuffer, 0, data.available());
+                    if(serialBuffer[1]==39 && serialBuffer[2] == 16)
+                    {
+                        System.out.println(serialBuffer[1]<<8 | serialBuffer[2]);
+                        break out;
+                    }
                     if(serialBuffer.length==3)
                     {
                         int combinedByte = (serialBuffer[1]<<8) | serialBuffer[2];
-                        System.out.println(combinedByte);
-                        System.out.println(serialBuffer[0]);
+                        System.out.println("Time: " + combinedByte);
+                        System.out.println(serialBuffer[0] + " C");
                         x.add(combinedByte);
                         y.add(Byte.toUnsignedInt(serialBuffer[0]));
+                        break out;
                     }
                     else
                     {
-                        for(Byte bite:serialBuffer)
-                        {
-                            System.out.println(bite);
-                        }
+                        System.out.println(("Time: " + serialBuffer[1]));
+                        System.out.println((serialBuffer[0] + " C"));
+
                         x.add(Byte.toUnsignedInt(serialBuffer[1]));
                         y.add(Byte.toUnsignedInt(serialBuffer[0]));
                     }
