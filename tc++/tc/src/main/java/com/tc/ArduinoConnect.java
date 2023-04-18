@@ -39,24 +39,37 @@ public class ArduinoConnect {
                     byte[] serialBuffer = new byte[data.available()];
                     // Assigns bytes from Serial conenction to byte array
                     data.readNBytes(serialBuffer, 0, data.available());
+                    if(serialBuffer.length>2){
+                    if(serialBuffer[1]==28 && serialBuffer[2] == 32)
+                    {
+                        System.out.println("Two hour limit reached");
+                        break out;
+                    }
                     if(serialBuffer[1]==39 && serialBuffer[2] == 16)
                     {
-                        System.out.println(serialBuffer[1]<<8 | serialBuffer[2]);
-                        break out;
+                        System.out.println("Generating graph");
+                        Graph graph1 = new Graph(x,y,1);
+                        Graph graph2 = new Graph(x,y,2);
+                        Graph graph3 = new Graph(x,y,3);
+                        graph1.drawGraph();
+                        graph2.drawGraph();
+                        graph3.drawGraph();
+                    }
+                    
                     }
                     if(serialBuffer.length==3)
                     {
                         int combinedByte = (serialBuffer[1]<<8) | serialBuffer[2];
-                        System.out.println("Time: " + combinedByte);
-                        System.out.println(serialBuffer[0] + " C");
+                        // System.out.println("Time: " + combinedByte);
+                        // System.out.println(serialBuffer[0] + " C");
                         x.add(combinedByte);
                         y.add(Byte.toUnsignedInt(serialBuffer[0]));
                         break out;
                     }
                     else
                     {
-                        System.out.println(("Time: " + serialBuffer[1]));
-                        System.out.println((serialBuffer[0] + " C"));
+                        // System.out.println(("Time: " + serialBuffer[1]));
+                        // System.out.println((serialBuffer[0] + " C"));
 
                         x.add(Byte.toUnsignedInt(serialBuffer[1]));
                         y.add(Byte.toUnsignedInt(serialBuffer[0]));
