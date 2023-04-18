@@ -9,4 +9,13 @@
 
     <string name="hello_first_fragment">Press Connect to Begin</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+
+        <string name="examplesarr">dropDownMenuExample</string>
+        <string-array name="examples">
+            <item>Water</item>
+            <item>Chicken</item>
+            <item>Pork</item>
+            <item>Beef</item>
+        </string-array>
+
 </resources>
