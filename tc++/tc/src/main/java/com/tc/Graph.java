@@ -10,11 +10,10 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-// Dependent on ArduinoConnect.java
 
 public class Graph 
 {
-        private final int X_AXIS = 1250;
+        private final int X_AXIS = 900;
         private final int Y_AXIS = 50;
         private ArrayList<Integer> x;
         private ArrayList<Integer> y;
@@ -44,7 +43,7 @@ public class Graph
         public void drawGraph()
         {
             JFrame frame = new JFrame("Food Temperature over Time: Degree " + degree);
-        frame.setSize(7200,7200);
+        frame.setSize(2500,2500);
         frame.setVisible(true);
         
         JPanel panel = new JPanel() {
@@ -56,14 +55,14 @@ public class Graph
                 g2d.setColor(Color.BLACK);
                 Font font = new Font(Font.DIALOG, Font.PLAIN, 30);
                 g2d.setFont(font);
-                g2d.drawString("Time (s)", 1300, 1300);
-                g2d.translate(35,800);
+                g2d.drawString("Time (s)", 850, 650);
+                g2d.translate(35,500);
                 g2d.rotate(-Math.PI/2);
                 g2d.drawString("Temperature (C)", 0, 0);
                 g2d.rotate(Math.PI/2);
                 g2d.translate(-35,-800);
-                g2d.drawLine(0,X_AXIS,7200,X_AXIS);
-                g2d.drawLine(Y_AXIS,0,Y_AXIS,7200);
+                g2d.drawLine(0,X_AXIS,1800,X_AXIS);
+                g2d.drawLine(Y_AXIS,0,Y_AXIS,3400);
                 g2d.setColor(Color.RED);
                 boolean gb = true;
                 boolean cb = true;
@@ -75,7 +74,7 @@ public class Graph
         {
             if((int)tempFun.value(i) == 63 && cb && (int)tempFun.value(i)!=Integer.MAX_VALUE && (int)tempFun.value(i)!=Integer.MIN_VALUE)
             {
-                g2d.drawLine((int)(Y_AXIS + tempFun.value(i)),0,(int)(Y_AXIS+tempFun.value(i)),7200);
+                g2d.drawLine((int)(Y_AXIS + tempFun.value(i)),0,(int)(Y_AXIS+tempFun.value(i)),3400);
                 if(i<60)
                 {
                     g2d.drawString("Red Meat "+i+"s",500,X_AXIS + 25);
@@ -83,11 +82,12 @@ public class Graph
                 else{
                     g2d.drawString("Red Meat "+i/60+"min " + i%60+"s",500,X_AXIS + 25);
                 }
+                System.out.println("Time: " + i + " " + "Predicted Temp: " + (int)tempFun.value(i));
                 cb = false;
             }
             if((int)tempFun.value(i) == 71 && gb && (int)tempFun.value(i)!=Integer.MAX_VALUE && (int)tempFun.value(i)!=Integer.MIN_VALUE)
             {
-                g2d.drawLine((int)(Y_AXIS + tempFun.value(i)),0,(int)(Y_AXIS+tempFun.value(i)),7200);
+                g2d.drawLine((int)(Y_AXIS + tempFun.value(i)),0,(int)(Y_AXIS+tempFun.value(i)),3400);
                 if(i<60)
                 {
                     g2d.drawString("Ground Beef "+i+"s",500,X_AXIS + 50);
@@ -95,6 +95,7 @@ public class Graph
                 else{
                     g2d.drawString("Ground Beef "+i/60+"min " + i%60+"s",500,X_AXIS + 50);
                 }
+                System.out.println("Time: " + i + " " + "Predicted Temp: " + (int)tempFun.value(i));
                 gb =false;
             }
             if((int)tempFun.value(i) == 74 && (int)tempFun.value(i)!=Integer.MAX_VALUE && (int)tempFun.value(i)!=Integer.MIN_VALUE)
@@ -106,18 +107,17 @@ public class Graph
                 else{
                     g2d.drawString("Poultry "+i/60+"min " + i%60+"s",500,X_AXIS + 75);
                 }
-                g2d.drawLine((int)(Y_AXIS + tempFun.value(i)),0,(int)(Y_AXIS+tempFun.value(i)),7200);
+                System.out.println("Time: " + i + " " + "Predicted Temp: " + (int)tempFun.value(i));
+                g2d.drawLine((int)(Y_AXIS + tempFun.value(i)),0,(int)(Y_AXIS+tempFun.value(i)),3400);
                 break;
             }
         }
             }
         }; 
-        panel.setSize(7200, 7200);
+        panel.setSize(2500, 2500);
         panel.setVisible(true);
         frame.add(panel);
-        for (int x = 0; x < 7200; x++) {
-            System.out.println("Time: " + x + " " + "Predicted Temp: " + (int)tempFun.value(x));
-        }
+        
         }
     
 }

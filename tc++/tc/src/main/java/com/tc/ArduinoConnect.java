@@ -25,6 +25,8 @@ public class ArduinoConnect {
         for (SerialPort eachComPort : allAvailableComPorts)
             System.out.println("List of all available serial ports: " + eachComPort.getSystemPortName());
         comport = SerialPort.getCommPort(allAvailableComPorts[0].getSystemPortName());
+        // No timeout
+        // 9600 for Serial and expect 8 bits
         comport.setComPortTimeouts(0, 0, 0);
         comport.setComPortParameters(9600, 8, 1, 0);
         if (comport.openPort()) {
@@ -37,7 +39,7 @@ public class ArduinoConnect {
                     // Creates a byte array to store all bytes in the Serial connection
                     
                     byte[] serialBuffer = new byte[data.available()];
-                    // Assigns bytes from Serial conenction to byte array
+                    // Assigns bytes from Serial connection to byte array
                     data.readNBytes(serialBuffer, 0, data.available());
                     if(serialBuffer.length>2){
                     if(serialBuffer[1]==28 && serialBuffer[2] == 32)
@@ -45,6 +47,7 @@ public class ArduinoConnect {
                         System.out.println("Two hour limit reached");
                         break out;
                     }
+                    // Graph if receive 10,000 from Arduino
                     if(serialBuffer[1]==39 && serialBuffer[2] == 16)
                     {
                         System.out.println("Generating graph");
@@ -54,22 +57,21 @@ public class ArduinoConnect {
                         graph1.drawGraph();
                         graph2.drawGraph();
                         graph3.drawGraph();
+                    }                    
                     }
-                    
-                    }
+                    // Correct time bytes once they are over 256
                     if(serialBuffer.length==3)
                     {
-                        int combinedByte = (serialBuffer[1]<<8) | serialBuffer[2];
-                        // System.out.println("Time: " + combinedByte);
-                        // System.out.println(serialBuffer[0] + " C");
+                        int combinedByte = (Byte.toUnsignedInt(serialBuffer[1])<<8) | Byte.toUnsignedInt(serialBuffer[2]);
+                        System.out.println("Time: " + combinedByte);
+                        System.out.println(serialBuffer[0] + " C");
                         x.add(combinedByte);
                         y.add(Byte.toUnsignedInt(serialBuffer[0]));
-                        break out;
                     }
                     else
                     {
-                        // System.out.println(("Time: " + serialBuffer[1]));
-                        // System.out.println((serialBuffer[0] + " C"));
+                        System.out.println(("Time: " + Byte.toUnsignedInt(serialBuffer[1])));
+                        System.out.println((serialBuffer[0] + " C"));
 
                         x.add(Byte.toUnsignedInt(serialBuffer[1]));
                         y.add(Byte.toUnsignedInt(serialBuffer[0]));

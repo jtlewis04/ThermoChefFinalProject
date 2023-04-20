@@ -29,8 +29,8 @@ void setup() {
 
 void loop() {
   degreesC = thermocouple.readCelsius();
-  time = (millis() / 1000.0);
-degreesC = thermocouple.readCelsius();
+  time = ((millis()) / 1000.0);
+// degreesC = thermocouple.readCelsius();
 lcd.setCursor(0,0);
   lcd.print("Temp: ");
   lcd.print(degreesC);
@@ -40,20 +40,22 @@ lcd.setCursor(0,0);
   lcd.print(time);
   lcd.print(" s");
   if(digitalRead(stopButton)==LOW){
-    Serial.write(byte(degreesC));
+    Serial.write(2);
     Serial.write(byte(10000/256));
   // Last 8 bits
   Serial.write(byte(10000));
   Serial.flush();
   }
   degreesC = thermocouple.readCelsius();
-  
-  if(time>256)
+  // Serial.println(byte(time));
+  if(time>=256)
   {
+    // Serial.println(byte(time/256);
     Serial.write(byte(degreesC));
   delay(1);
   // First 8 bits
   Serial.write(byte(time/256));
+  // Serial.println(byte(time));
   delay(1);
   // Last 8 bits
   Serial.write(byte(time));
